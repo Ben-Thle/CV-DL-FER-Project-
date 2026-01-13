@@ -5,3 +5,5 @@ opencv-python
 matplotlib
 scikit-learn
 tqdm
+pandas
+pillow
