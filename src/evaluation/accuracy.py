@@ -8,18 +8,15 @@ def calculate_accuracy(
     y_pred: Union[np.ndarray, list],
     normalize: bool = True) -> float:
  
-    # Convert to numpy arrays if needed
     y_true = np.asarray(y_true)
     y_pred = np.asarray(y_pred)
     
-    # Validate inputs
     if y_true.shape != y_pred.shape:
         raise ValueError(
             f"y_true and y_pred must have the same shape. "
             f"Got {y_true.shape} and {y_pred.shape}"
         )
     
-    # Use sklearn's implementation for reliability
     return sklearn_accuracy_score(
         y_true=y_true,
         y_pred=y_pred,
