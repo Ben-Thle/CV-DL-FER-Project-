@@ -80,7 +80,6 @@ def calculate_f1_scores_per_class(
     
     return dict(zip(labels, f1_scores))
 
-
 def calculate_macro_f1_score(
     y_true: Union[np.ndarray, list],
     y_pred: Union[np.ndarray, list],
