@@ -38,7 +38,6 @@ class ImageFolderDataset(Dataset):
 
         return image, label
 
-
 train_transform = transforms.Compose([
     transforms.Resize((64, 64)),
     transforms.RandomHorizontalFlip(p=0.5),
@@ -52,7 +51,28 @@ test_transform = transforms.Compose([
     transforms.Resize((64, 64)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.5], std=[0.5])
-]) 
+])
+
+from pathlib import Path
+
+project_root = Path(__file__).resolve().parents[2]
+base = project_root / "data" / "processed" / "split_data"
+
+train_dataset = ImageFolderDataset(
+    base / "train",
+    transform=train_transform
+)
+
+val_dataset = ImageFolderDataset(
+    base / "val",
+    transform=test_transform
+)
+
+test_dataset = ImageFolderDataset(
+    base / "test",
+    transform=test_transform
+)
+
 
 train_dataset = ImageFolderDataset(
     '/FER2013_dataset/train',
@@ -63,3 +83,5 @@ test_dataset = ImageFolderDataset(
     '/FER2013_dataset/test',
     transform=test_transform
 )
+
+
