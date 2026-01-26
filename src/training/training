@@ -1,1 +1,35 @@
 
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# build model
+spec = build_model("resnet18", num_classes=6)
+model = spec.model.to(device)
+
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=2)
+
+model.train()
+for epoch in range(3):
+    total_loss, correct, total = 0.0, 0, 0
+
+    for x, y in train_loader:
+        x, y = x.to(device), y.to(device)
+
+        optimizer.zero_grad()
+        logits = model(x)
+        loss = criterion(logits, y)
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item() * x.size(0)
+        pred = logits.argmax(dim=1)
+        correct += (pred == y).sum().item()
+        total += y.size(0)
+
+    print(f"Epoch {epoch+1}: loss={total_loss/total:.4f}, acc={correct/total:.4f}")
