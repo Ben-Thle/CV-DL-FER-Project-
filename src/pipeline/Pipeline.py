@@ -143,6 +143,6 @@ for split_name, split_data in [("train", train), ("val", val), ("test", test)]:
         
 
         csv_path = target_dir / "data.csv"
-        pd.DataFrame(emotion_data).to_csv(csv_path, index=False)
+        pd.DataFrame(processed_samples).to_csv(csv_path, index=False)
         
-        print(f"Saved {len(emotion_data)} samples for {split_name}/{emotion} to {csv_path}")
+        print(f"Saved {len(processed_samples)} processed samples for {split_name}/{emotion} to {csv_path}")
