@@ -134,7 +134,34 @@ for split_name, split_data in [("train", train), ("val", val), ("test", test)]:
         target_dir = base / split_name / emotion
         target_dir.mkdir(parents=True, exist_ok=True)
         
-        csv_path = target_dir / "data.csv"
-        pd.DataFrame(emotion_data).to_csv(csv_path, index=False)
+        # Process and save images
+        processed_samples = []
+        for idx, sample in enumerate(emotion_data):
+            original_path = Path(sample["path"])
+
+            image = Image.open(original_path)
+            if sample["dataset"] == "FER2013":
+                image = image.convert("RGB")
+            
+            processed = processImage(image)
+            if processed is not None:
+                processed_image = processed
+            else:
+                processed_image = image.resize((64, 64))
+            
+            # Save processed image
+            processed_filename = f"{emotion}_{idx:06d}.jpg"
+            processed_path = target_dir / processed_filename
+            processed_image.save(processed_path)
+            
+            # Update sample 
+            processed_samples.append({
+                "path": str(processed_path),
+                "emotion": emotion,
+                "dataset": sample["dataset"]
+            })
         
-        print(f"Saved {len(emotion_data)} samples for {split_name}/{emotion} to {csv_path}")
+        csv_path = target_dir / "data.csv"
+        pd.DataFrame(processed_samples).to_csv(csv_path, index=False)
+        
+        print(f"Saved {len(processed_samples)} processed samples for {split_name}/{emotion} to {csv_path}")

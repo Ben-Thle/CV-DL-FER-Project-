@@ -31,3 +31,4 @@ def resnet18(*, num_classes: int = 6, input_channels: int = 3, small_input: bool
 
     model.fc = nn.Linear(model.fc.in_features, num_classes)
     return model
+
