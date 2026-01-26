@@ -47,3 +47,75 @@ def calculate_recall(
         average=average,
         labels=labels,
         zero_division=zero_division)
+
+
+def calculate_precision_per_class(
+    y_true: Union[np.ndarray, list],
+    y_pred: Union[np.ndarray, list],
+    labels: Optional[Union[np.ndarray, list]] = None,
+    zero_division: Union[str, float] = 0.0) -> dict:
+
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    
+    if labels is None:
+        labels = np.unique(np.concatenate([y_true, y_pred]))
+    
+    precision_scores = calculate_precision(
+        y_true=y_true,
+        y_pred=y_pred,
+        average=None,
+        labels=labels,
+        zero_division=zero_division)
+    
+    return dict(zip(labels, precision_scores))
+
+
+def calculate_recall_per_class(
+    y_true: Union[np.ndarray, list],
+    y_pred: Union[np.ndarray, list],
+    labels: Optional[Union[np.ndarray, list]] = None,
+    zero_division: Union[str, float] = 0.0) -> dict:
+
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    
+    if labels is None:
+        labels = np.unique(np.concatenate([y_true, y_pred]))
+    
+    recall_scores = calculate_recall(
+        y_true=y_true,
+        y_pred=y_pred,
+        average=None,
+        labels=labels,
+        zero_division=zero_division)
+    
+    return dict(zip(labels, recall_scores))
+
+
+def calculate_macro_precision(
+    y_true: Union[np.ndarray, list],
+    y_pred: Union[np.ndarray, list],
+    labels: Optional[Union[np.ndarray, list]] = None,
+    zero_division: Union[str, float] = 0.0) -> float:
+
+    return calculate_precision(
+        y_true=y_true,
+        y_pred=y_pred,
+        average='macro',
+        labels=labels,
+        zero_division=zero_division)
+
+
+def calculate_macro_recall(
+    y_true: Union[np.ndarray, list],
+    y_pred: Union[np.ndarray, list],
+    labels: Optional[Union[np.ndarray, list]] = None,
+    zero_division: Union[str, float] = 0.0) -> float:
+
+    return calculate_recall(
+        y_true=y_true,
+        y_pred=y_pred,
+        average='macro',
+        labels=labels,
+        zero_division=zero_division)

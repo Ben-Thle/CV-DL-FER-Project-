@@ -19,3 +19,6 @@ experiments/*
 # IDE
 .vscode/
 .idea/
+
+# Documentation (local only)
+docs/
