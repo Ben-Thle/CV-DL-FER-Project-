@@ -6,6 +6,9 @@ from collections import defaultdict, Counter
 import random
 from pathlib import Path
 import pandas as pd
+import shutil
+import io
+import base64
 
 PipelineDir = Path(__file__).resolve().parent
 SrcDir = PipelineDir.parent
@@ -88,9 +91,13 @@ for dataset in datasets:
                     else:
                         image = image.resize((64, 64))
 
+                    buffer = io.BytesIO()
+                    image.save(buffer, format='PNG')
+                    img_str = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
                     print("Step:", imagecounter,"| Dataset:", dataset,"| Original Split:", split,"| Emotion:", emotion)
 
-                    samples.append({"path": str(image_path),"emotion": emotion,"dataset": dataset})
+                    samples.append({"image_data": img_str, "emotion": emotion, "dataset": dataset})
 
 
 groups = defaultdict(list)
@@ -134,33 +141,7 @@ for split_name, split_data in [("train", train), ("val", val), ("test", test)]:
         target_dir = base / split_name / emotion
         target_dir.mkdir(parents=True, exist_ok=True)
         
-        # Process and save images
-        processed_samples = []
-        for idx, sample in enumerate(emotion_data):
-            original_path = Path(sample["path"])
 
-            image = Image.open(original_path)
-            if sample["dataset"] == "FER2013":
-                image = image.convert("RGB")
-            
-            processed = processImage(image)
-            if processed is not None:
-                processed_image = processed
-            else:
-                processed_image = image.resize((64, 64))
-            
-            # Save processed image
-            processed_filename = f"{emotion}_{idx:06d}.jpg"
-            processed_path = target_dir / processed_filename
-            processed_image.save(processed_path)
-            
-            # Update sample 
-            processed_samples.append({
-                "path": str(processed_path),
-                "emotion": emotion,
-                "dataset": sample["dataset"]
-            })
-        
         csv_path = target_dir / "data.csv"
         pd.DataFrame(processed_samples).to_csv(csv_path, index=False)
         
