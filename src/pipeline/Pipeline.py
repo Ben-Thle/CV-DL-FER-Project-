@@ -6,7 +6,6 @@ from collections import defaultdict, Counter
 import random
 from pathlib import Path
 import pandas as pd
-import shutil
 import io
 import base64
 
@@ -90,6 +89,8 @@ for dataset in datasets:
                         image = processed
                     else:
                         image = image.resize((64, 64))
+
+                    image = image.convert("L")
 
                     buffer = io.BytesIO()
                     image.save(buffer, format='PNG')
