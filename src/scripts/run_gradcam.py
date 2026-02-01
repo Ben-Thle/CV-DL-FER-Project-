@@ -3,13 +3,13 @@ from pathlib import Path
 
 print("RUN_GRADCAM: file executed")
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 
 import torch
 from PIL import Image
-from torchvision.datasets import ImageFolder
+from src.data_prep import ImageFolderDataset
 from torchvision import transforms
 
 from src.models.model import build_model
@@ -63,6 +63,6 @@ def main():
     overlay.save(out_path)
     print("RUN_GRADCAM: saved", out_path)
 
-
+#für ein problem das ich hatte beim Runnen
 if __name__ == "__main__":
     main()
