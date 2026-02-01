@@ -21,8 +21,8 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    tfm = transforms.Compose([transforms.ToTensor()])
-    dataset = ImageFolder(ROOT / "data" / "processed", transform=tfm)
+    tfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=[0.5], std=[0.5])])
+    dataset = ImageFolder(ROOT / "data" / "processed"/ "split_data", transform=tfm)
     print("RUN_GRADCAM: classes =", dataset.classes)
 
     model = build_model(
@@ -34,7 +34,7 @@ def main():
 
     ckpt = ROOT / "best_model.pt"
     if not ckpt.exists():
-        # common alternative in your repo
+        
         alt = ROOT / "experiments_finetuned" / "best_model.pt"
         if alt.exists():
             ckpt = alt
@@ -54,8 +54,10 @@ def main():
     pred_name = dataset.classes[res.class_idx]
     true_name = dataset.classes[int(y)]
     print(f"RUN_GRADCAM: true={true_name} pred={pred_name} logit={res.score:.4f}")
+    img_cpu=img.detach().cpu()
+    img_denormalized=(img_cpu*0.5+0.5).clamp(0,1)
 
-    pil_gray = Image.fromarray((img[0].numpy() * 255).astype("uint8"))
+    pil_gray = Image.fromarray((img_denormalized[0].numpy() * 255).astype("uint8"))
     pil_gray = pil_gray.resize((x.shape[-1], x.shape[-2]))
 
     overlay = overlay_red(pil_gray.convert("RGB"), res.cam, alpha=0.45)
