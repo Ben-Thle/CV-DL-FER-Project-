@@ -6,6 +6,7 @@ from torch.utils.data import Dataset
 from PIL import Image
 import pandas as pd
 
+
 class FERFolderCSVDataset(Dataset):
     def __init__(self, split_root, class_names, transform=None):
         self.transform = transform
@@ -102,7 +103,9 @@ def main():
     out_dir = ROOT / "gradcam_outputs"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    for idx in range(min(10, len(dataset))):
+    import random
+    indexes=random.sample(range(len(dataset)), k=min(10, len(dataset)))
+    for idx in indexes:
         img, y = dataset[idx]
         x = img.unsqueeze(0).to(device)
 
