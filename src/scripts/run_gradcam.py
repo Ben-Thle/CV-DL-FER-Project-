@@ -1,9 +1,10 @@
 import sys
 from pathlib import Path
-import pandas as pd
+import base64
+import io
 from torch.utils.data import Dataset
-import numpy as np
 from PIL import Image
+import pandas as pd
 
 class FERFolderCSVDataset(Dataset):
     def __init__(self, split_root, class_names, transform=None):
@@ -17,34 +18,31 @@ class FERFolderCSVDataset(Dataset):
             csv_path = split_root / cname / "data.csv"
             df = pd.read_csv(csv_path)
 
-            if "pixels" in df.columns:
-                for p in df["pixels"].astype(str):
-                    arr = np.fromstring(p, sep=" ", dtype=np.uint8)
-                    self.samples.append((arr, label))
-            else:
-                num_df = df.select_dtypes(include=[np.number])
-                for _, row in num_df.iterrows():
-                    arr = row.to_numpy(dtype=np.uint8)
-                    self.samples.append((arr, label))
+            if "image_data" not in df.columns:
+                raise ValueError(
+                    f"{csv_path} does not contain 'image_data'. Columns: {df.columns.tolist()}"
+                )
+
+            for b64 in df["image_data"].astype(str):
+                self.samples.append((b64, label))
 
     def __len__(self):
         return len(self.samples)
 
     def __getitem__(self, idx):
-        arr, label = self.samples[idx]
+        b64, label = self.samples[idx]
 
-        n = int(np.sqrt(len(arr)))
-        if n * n != len(arr):
-            raise ValueError(f"Cannot reshape array of length {len(arr)} into square image")
+        # decode base64 PNG -> PIL
+        raw = base64.b64decode(b64)
+        pil = Image.open(io.BytesIO(raw)).convert("L")  # grayscale 64x64
 
-        img = arr.reshape(n, n)
-        pil = Image.fromarray(img, mode="L")  
         if self.transform:
             x = self.transform(pil)
         else:
             x = pil
 
         return x, label
+
 
 
 print("RUN_GRADCAM: file executed")
@@ -122,9 +120,18 @@ def main():
             mode="L"
         )
 
+     
+
         overlay = overlay_red(pil_gray.convert("RGB"), res.cam, alpha=0.45)
 
         out_path = out_dir / f"idx{idx:03d}_true_{true_name}_pred_{pred_name}.png"
+        # Debug: save the base image too (so you can see if it's black)
+        base_path = out_dir / f"idx{idx:03d}_base.png"
+        pil_gray.save(base_path)
+
+
+        print(f"img_denorm min/max: {img_denormalized.min().item():.3f} / {img_denormalized.max().item():.3f}")
+
         overlay.save(out_path)
         print("saved:", out_path)
 
