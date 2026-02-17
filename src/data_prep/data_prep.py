@@ -41,16 +41,15 @@ class ImageFolderDataset(Dataset):
         img_data = self.image_data[idx]
         label = self.labels[idx]
 
-        # Decode base64 image using the provided code
         img_bytes = base64.b64decode(img_data)
-        image = Image.open(io.BytesIO(img_bytes)).convert("L")
+        image = Image.open(io.BytesIO(img_bytes)).convert("L") #convert to grayscale
 
         if self.transform:
             image = self.transform(image)
 
         return image, label
 
-# transforms (grayscale: mean/std have 1 value) --
+
 train_transform = transforms.Compose([
     transforms.Resize((64, 64)),
     transforms.RandomHorizontalFlip(p=0.5),  
@@ -65,7 +64,6 @@ test_transform = transforms.Compose([
 ])
 
 
-#  dataset paths
 project_root = Path(__file__).resolve().parents[1]
 base = project_root / "data" / "processed" / "split_data"
 
