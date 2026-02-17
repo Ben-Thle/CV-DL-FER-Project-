@@ -21,7 +21,7 @@ class ImageFolderDataset(Dataset):
         )
         self.class_to_idx = {cls: idx for idx, cls in enumerate(self.class_names)}
 
-        self.image_data = []  # Store base64 strings or image data
+        self.image_data = []
         self.labels = []
 
         # Load from CSV files with base64-encoded images
@@ -30,7 +30,7 @@ class ImageFolderDataset(Dataset):
             if csv_path.exists():
                 df = pd.read_csv(csv_path)
                 for _, row in df.iterrows():
-                    img_data = row['image_data']  # Base64-encoded image string
+                    img_data = row['image_data']
                     self.image_data.append(img_data)
                     self.labels.append(self.class_to_idx[class_name])
 
@@ -50,9 +50,9 @@ class ImageFolderDataset(Dataset):
 
         return image, label
 
-
 # transforms (grayscale: mean/std have 1 value) --
 train_transform = transforms.Compose([
+    transforms.Resize((64, 64)),
     transforms.RandomHorizontalFlip(p=0.5),  
     transforms.RandomRotation(degrees=15),  
     transforms.ToTensor(),
@@ -72,4 +72,3 @@ base = project_root / "data" / "processed" / "split_data"
 train_dataset = ImageFolderDataset(base / "train", transform=train_transform)
 val_dataset   = ImageFolderDataset(base / "val",   transform=test_transform)
 test_dataset  = ImageFolderDataset(base / "test",  transform=test_transform)
-
