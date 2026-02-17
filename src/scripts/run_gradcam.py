@@ -33,9 +33,9 @@ class FERFolderCSVDataset(Dataset):
     def __getitem__(self, idx):
         b64, label = self.samples[idx]
 
-        # decode base64 PNG -> PIL
+     
         raw = base64.b64decode(b64)
-        pil = Image.open(io.BytesIO(raw)).convert("L")  # grayscale 64x64
+        pil = Image.open(io.BytesIO(raw)).convert("L")  
 
         if self.transform:
             x = self.transform(pil)
@@ -128,7 +128,7 @@ def main():
         overlay = overlay_red(pil_gray.convert("RGB"), res.cam, alpha=0.45)
 
         out_path = out_dir / f"idx{idx:03d}_true_{true_name}_pred_{pred_name}.png"
-        # Debug: save the base image too (so you can see if it's black)
+      
         base_path = out_dir / f"idx{idx:03d}_base.png"
         pil_gray.save(base_path)
 
