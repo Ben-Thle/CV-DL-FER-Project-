@@ -9,13 +9,12 @@ from facenet_pytorch import MTCNN
 import numpy as np
 
 
+input_folder = r"input_folder"
+output_location = r"output_location"
+
 device = torch.device("cpu")
 
 mtcnn = MTCNN(image_size=160, margin=20, min_face_size=40,thresholds=[0.6, 0.7, 0.7], factor=0.709,post_process=True, device=device)
-
-
-input_folder = r"D:\Uni\Semester III\Praktikum\Projekt\3\TestImages"
-output_location = r"D:\Uni\Semester III\Praktikum\Projekt\3\results.csv"
 
 checkpoint = torch.load("src/camDemo/checkpoint_epoch_61.pt", map_location='cpu')
 num_classes = 6

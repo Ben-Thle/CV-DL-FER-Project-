@@ -9,13 +9,14 @@ from src.explainability.gradcam import GradCAM, overlay_red, load_checkpoint_fle
 from facenet_pytorch import MTCNN
 from collections import Counter
 
+input = cv2.VideoCapture("input_location")
+
 device = torch.device("cpu")
 mtcnn = MTCNN(image_size = 160, margin = 20, min_face_size = 40, thresholds = [0.6, 0.7, 0.7], factor = 0.709, post_process = True, device = device)
 checkpoint = torch.load("src/camDemo/checkpoint_epoch_61.pt", map_location='cpu')
 
 
-cap = cv2.VideoCapture("C:/Users/Vinzenz/Downloads/Phone Link/20260217_161152.mp4")
-src_fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
+src_fps = input.get(cv2.CAP_PROP_FPS) or 25.0
 frame_duration = 1.0 / src_fps
 counter = []
 framecounter = 0
@@ -127,7 +128,7 @@ def processImage(image):
 while True:
     framecounter+=1
     t0 = time.perf_counter()
-    ret, frame = cap.read()
+    ret, frame = input.read()
     if not ret:
         break
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -190,7 +191,7 @@ while True:
     else:
         cv2.waitKey(1)
 
-cap.release()
+input.release()
 cv2.destroyAllWindows()
 c = Counter(counter)
 print("Predicted emotion:", labels[c.most_common(1)[0][0]])
